@@ -1,28 +1,27 @@
-# 3D Image Gallery Project
+# Rotating Soda Can Project
 
-An interactive 3D image gallery that responds to hover events with depth perception effects. This project demonstrates advanced CSS techniques including 3D transforms, sibling selectors, and the `:has()` pseudo-class.
+An interactive animation that creates the illusion of a soda can rotating when hovered over. This project demonstrates advanced CSS techniques including CSS variables, blend modes, masking, and smooth transitions.
 
 ## Preview
 
-The gallery displays a row of images that initially appear darkened. When you hover over an image:
-- The hovered image moves forward (z-axis) and becomes fully visible
-- The next three images to the right move forward with decreasing intensity and rotate slightly
-- The previous three images to the left also move forward with decreasing intensity and rotate in the opposite direction
-- This creates an immersive 3D effect that responds to user interaction
+The project shows a soda can that appears to rotate when you hover over it:
+- Initially, one version of the soda can is visible
+- On hover, the first can fades out while a second version fades in
+- The background image shifts horizontally, creating a rotating effect
+- The entire product container moves upward slightly on hover
 
 ## File Structure
-```bash
+```
 project-folder/
 │
 ├── index.html
 ├── styles.css
-├── 1.jpg
-├── 2.jpg
-├── ... (all your image files)
+├── 1.png (First soda can texture)
+├── 2.png (Second soda can texture)
+├── soda.png (Soda can mask/shape)
+├── bg.jpg (Background image)
 └── README.md
 ```
----
-
 ## Step-by-Step Implementation Guide
 
 ### 1. HTML Structure
@@ -30,195 +29,205 @@ project-folder/
 Create an `index.html` file and add the following code:
 
 ```html
-<!DOCTYPE html>
+<!DOCTYPE html> 
 <html lang="en">
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <link rel="stylesheet" href="styles.css">
-    <title>3D Image Gallery</title>
+    <title>Rotating Soda Can</title>
 </head>
 <body>
-    <main>
-        <div class="list">
-            <div class="item"><img src="1.jpg" alt="Image 1"></div>
-            <div class="item"><img src="2.jpg" alt="Image 2"></div>
-            <div class="item"><img src="3.jpg" alt="Image 3"></div>
-            <div class="item"><img src="4.jpg" alt="Image 4"></div>
-            <div class="item"><img src="5.jpg" alt="Image 5"></div>
-            <div class="item"><img src="6.jpg" alt="Image 6"></div>
-            <div class="item"><img src="7.jpg" alt="Image 7"></div>
-            <div class="item"><img src="8.jpg" alt="Image 8"></div>
-            <div class="item"><img src="9.jpg" alt="Image 9"></div>
-            <div class="item"><img src="10.jpg" alt="Image 10"></div>
+    <div class="banner">
+        <div class="product">
+            <div class="soda" style="--url: url(1.png)">
+            </div>
+            <div class="soda" style="--url: url(2.png)">
+            </div>
         </div>
-    </main>
+    </div>
 </body>
 </html>
 ```
 Explanation:
 
-- The basic HTML structure with viewport meta tag for responsive design
-- A `<main>` container to hold our gallery
-- A `<div>` with class "list" that will become our 3D container
-- Multiple `<div>` elements with class "item", each containing an image
-
+- The HTML structure is minimal and focused on the effect
+- Uses a banner container to hold everything
+- The product div contains two soda divs that will create the rotation effect
+- CSS custom properties (variables) are used inline to set different images for each soda div
+- The `--url` variable will be used in the CSS to set background images
 ---
-
 ### 2. Basic CSS Setup
-Create a `styles.css` file and start with these foundational styles:
+Create a styles.css file and start with these foundational styles:
 
 ```css
 body {
-    background-color: black;
+    background-image: url('bg.jpg');
+    background-size: cover;
+    background-repeat: no-repeat;
     margin: 0;
     padding: 0;
 }
-
-.list {
-    display: flex;
-    justify-content: center; 
-    align-items: center;     
-    gap: 10px;                 
-    min-height: 100vh;  
-}
-
-.list img {
-    width: 130px;
-    height: auto;
-    border-radius: 6px;
-}
 ```
 Explanation:
 
-- Sets a black background for dramatic contrast
+- Sets a background image for the entire page
+- `background-size: cover` makes the background cover the entire viewport
 - Removes default margin and padding from the body
-- Makes the list a flex container to arrange images horizontally
-- Centers the gallery both vertically and horizontally
-- Adds spacing between images with the gap property
-- Ensures the gallery takes the full viewport height
-- Styles the images with consistent width and rounded corners
 ---
-### 3. 3D Transformation Setup
-Add these styles to enable 3D transformations:
+### 3. Banner Container Styles
+Add styles for the banner container:
 
 ```css
-.list {
-    transform-style: preserve-3d;
-    transform: perspective(1000px);
+.banner{
+    margin-top: -50px;
+    height: 100vh;
+    overflow: hidden;
+    position: relative;
 }
 ```
 Explanation:
 
-- `transform-style: preserve-3d` ensures child elements maintain their 3D position
-- `transform: perspective(1000px)` creates a 3D space with a specific depth perspective
-- A lower perspective value would create a more dramatic 3D effect
+- `margin-top: -50px` pulls the banner slightly upward
+- `height: 100vh` makes the banner take the full viewport height
+- `overflow: hidden` prevents any content from spilling outside the container
+- `position: relative` establishes a positioning context for child elements
 ---
-### 4. Initial State for Images
-Add the initial state for all gallery items:
+### 4. Product Container Styles
+Add styles for the product container:
 
 ```css
-.list .item {
-    transition: .5s;
-    filter: brightness(0);
+.product{
+    position: absolute;
+    left: 50%;
+    transform: translateX(-50%);
+    bottom: 0;
+    z-index: 2;
+    width: 500px;
+    transition: 0.7s;
 }
 ```
 Explanation:
 
-- `transition: .5s` creates smooth animations for all transform and filter changes
-- `filter: brightness(0)` makes all images completely black initially
+- `position: absolute` allows precise positioning within the banner
+- `left: 50%` combined with transform: translateX(-50%) centers the element horizontally
+- `bottom: 0` positions it at the bottom 
+- `z-index: 2` ensures it appears above other elements
+- `width: 500px` sets a fixed width
+- `transition: 0.7s` adds smooth animation to all property changes
 ---
-### 5. Hover Effects for the Target Image
-Add styles for when an image is directly hovered:
+### 5. Soda Can Base Styles
+Add the base styles for the soda can elements:
 
 ```css
-.list .item:hover {
-    transform: translateZ(200px);
-    filter: brightness(1);
+.product .soda{
+    position: absolute;
+    bottom: 0;
+    left: calc(50%);
+    transform: translateX(-50%);
+}
+
+.soda{
+    --left: 0px;
+    background: 
+        var(--url) var(--left),
+        url(soda.png) 0 0;
+    background-size: auto 100%;
+    width: 280px;
+    aspect-ratio: 2 / 4.08;
+    background-blend-mode: multiply;
+    transition: 0.8s;
+    mask-image: url(soda.png);
+    mask-size: auto 100%;
 }
 ```
 Explanation:
 
-- When hovering over an image, it moves 200px forward on the z-axis
-- The brightness filter is removed, making the image fully visible
+- The first rule positions each soda can absolutely at the bottom center of the product container
+- `-left: 0px` defines a CSS variable that will be animated later
+- The background uses two images:
+    1. `var(--url)` - the custom property set in HTML (either 1.png or 2.png)
+    2. `url(soda.png)` - a mask/shape that defines the can's outline
+- `background-size: auto 100%` maintains the aspect ratio of the background images
+- `width: 280px` sets the can width
+- `aspect-ratio: 2 / 4.08` defines the proportion of the can
+- `background-blend-mode: multiply` blends the two background images together
+- `transition: 0.8s` adds smooth animation
+- `mask-image: url(soda.png)` uses the soda.png as a mask to create the can shape
+- `mask-size: auto 100%` ensures the mask fits properly
 ---
-### 6. Sibling Selector Effects
-Add styles for the siblings following the hovered image:
+### 6. Initial State for Second Can
+Add styles to hide the second soda can initially:
 
 ```css
-.list .item:hover + * {
-    transform: translateZ(150px) rotateY(40deg);
-    filter: brightness(0.6);
-}
-
-.list .item:hover + * + * {
-    transform: translateZ(70px) rotateY(20deg);
-    filter: brightness(0.4);
-}
-
-.list .item:hover + * + * + * {
-    transform: translateZ(30px) rotateY(10deg);
-    filter: brightness(0.2);
+.soda:nth-child(2){
+    opacity: 0;
 }
 ```
 Explanation:
 
-- `+ *` selects the immediate next sibling
-- `+ * + *` selects the sibling after the next one (2nd sibling)
-- `+ * + * + *` selects the third sibling
-- Each subsequent sibling moves forward less and rotates less
-- Each has decreasing brightness to create a depth fade effect
+- Targets the second soda can element
+- `opacity: 0` makes it completely transparent initially
 ---
-### 7. Preceding Sibling Effects with :has() Selector
-Add styles for the siblings preceding the hovered image:
+### 7. Hover Effects
+Add the hover effects that create the rotation animation:
 
 ```css
-.list .item:has(+ *:hover) {
-    transform: translateZ(150px) rotateY(-40deg);
-    filter: brightness(0.6);
+.product:hover{
+    bottom: 100px;
 }
 
-.list .item:has(+ * + *:hover) {
-    transform: translateZ(70px) rotateY(-20deg);
-    filter: brightness(0.4);
+.product:hover .soda:nth-child(2){
+    opacity: 1;
+    --left: 500px;
 }
 
-.list .item:has(+ * + * + *:hover) {
-    transform: translateZ(30px) rotateY(-10deg);
-    filter: brightness(0.2);
+.product:hover .soda:nth-child(1){
+    opacity: 0;
+    --left: 500px;
 }
 ```
 Explanation:
 
-- `:has(+ *:hover)` selects an element that has an immediate next sibling being hovered
-- `:has(+ * + *:hover)` selects an element that has a second next sibling being hovered
-- The preceding siblings rotate in the opposite direction (negative values)
-- This creates a symmetrical effect around the hovered image
+- `product:hover` moves the entire product container 100px upward when hovered
+- `product:hover .soda:nth-child(2)` targets the second can on hover:
+- `opacity: 1` makes it fully visible
+- `--left: 500px` shifts the background position, creating the rotation effect
+- `product:hover .soda:nth-child(1)` targets the first can on hover:
+- `opacity: 0` makes it transparent
+- `--left: 500px` shifts its background position as well
 ---
 ### Key Concepts Explored
-#### 1. CSS 3D Transforms
-- `perspective()`: Creates a 3D space
-- `translateZ()`: Moves elements along the z-axis (depth)
-- `rotateY()`: Rotates elements around the y-axis (vertical rotation)
+1. CSS Custom Properties (Variables)
+    - Using `--url` and `--left` variables to control styling
+    - Setting variables inline in HTML and using them in CSS
 
-#### 2. Advanced CSS Selectors
-- Sibling selectors (+) for targeting adjacent elements
-- The `:has()` pseudo-class for selecting elements based on their descendants
+2. Advanced Background Techniques
+    - Multiple background images on a single element
+    - Background blend modes to combine images
+    - Background position animation
 
-#### 3. CSS Filters
-- `brightness()`: Adjusts the brightness of elements
-- Used creatively to enhance the depth perception effect
+3. CSS Masking
+    - Using `mask-image` to create complex shapes
+    - Controlling mask size and position
 
-#### 4. CSS Transitions
-- Smoothly animates changes in transform and filter properties
+4. CSS Transitions and Animations
+    - Smooth transitions between states
+    - Coordinated animations across multiple elements
+
+5. Positioning
+    - Absolute positioning for precise control
+    - Centering techniques using transform
+    - `Z-index` for layering
 
 ### Customization Ideas
-- Adjust the 3D intensity: Change the perspective value and translateZ values
-- Modify the animation speed: Adjust the transition duration
-- Change the image size: Modify the width of the images
-- Experiment with different filters: Try sepia, contrast, or blur filters
-- Add borders or shadows: Enhance the visual design with additional effects
----
-### Conclusion
-This 3D image gallery demonstrates how advanced CSS selectors and 3D transforms can create immersive, interactive experiences without JavaScript. The techniques shown here can be applied to various UI components like menus, carousels, and interactive product displays.
+1. Adjust the rotation speed: Change the transition duration values
+2. Modify the hover movement: Change the bottom value in the hover state
+3. Try different blend modes: Experiment with other blend modes like screen, overlay, etc.
+4. Add more can states: Create additional divs for a smoother rotation sequence
+5. Change the can size: Adjust the width and aspect-ratio properties
 
+---
+
+### Conclusion
+This rotating soda can effect demonstrates how CSS can create impressive animations without JavaScript. The techniques shown here,CSS variables, masking, blend modes, and transitions can be applied to create various interactive product displays and visual effects.
